@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pydantic
+google-cloud-storage
+google-cloud-aiplatform
+google-cloud-run
+numpy
+firebase-admin
+authlib
+python-multipart
+python-dotenv
+tensorflow-cpu
