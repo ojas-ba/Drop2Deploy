@@ -1,4 +1,5 @@
 from fastapi import HTTPException, Request
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 import firebase_admin
 from firebase_admin import auth, initialize_app, credentials
@@ -28,10 +29,10 @@ class FireBaseAuthenticationMiddleware(BaseHTTPMiddleware):
             auth_header = request.headers.get("Authorization")
             
             if not auth_header:
-                raise HTTPException(status_code=401, detail="Authorization header missing")
+                return JSONResponse(status_code=401, content={"detail": "Authorization header missing"})
             
             if not auth_header.startswith("Bearer "):
-                raise HTTPException(status_code=401, detail="Invalid authorization header format")
+                return JSONResponse(status_code=401, content={"detail": "Invalid authorization header format"})
             
             token = auth_header.split("Bearer ")[1]
             
@@ -39,11 +40,11 @@ class FireBaseAuthenticationMiddleware(BaseHTTPMiddleware):
                 decoded_token = auth.verify_id_token(token)
                 request.state.user = decoded_token
             except Exception as e:
-                raise HTTPException(status_code=401, detail="Invalid or expired token")
+                return JSONResponse(status_code=401, content={"detail": "Invalid or expired token"})                
 
             return await call_next(request)
         except HTTPException as e:
-            raise HTTPException(status_code=e.status_code,detail=e.detail)
+            return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
 
 # Also One more important thing ; 
